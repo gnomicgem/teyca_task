@@ -1,4 +1,4 @@
-# Расчет и подтверждение операции API
+# API Расчет и подтверждение операции
 
 Серверное приложение на базе Sinatra с использованием базы данных SQLite и библиотеки Sequel. 
 Предоставляет собой API для работы с операциями оплаты товаров, 
@@ -9,14 +9,14 @@
 Клонируйте репозиторий:
 
 ```bash
-   git clone https://github.com/gnomicgem/teyca_task.git
-   cd teyca_task
+git clone https://github.com/gnomicgem/teyca_task.git
+cd teyca_task
 ```
 
 Установите зависимости:
 
 ```bash
-  bundle install
+bundle install
 ```
 
 Запустите сервер:
