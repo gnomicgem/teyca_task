@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class SubmitOperationService
-  def initialize(operation, write_off)
+  def initialize(user, operation, write_off)
+    @user = user
     @operation = operation
     @write_off = write_off
   end
@@ -10,11 +11,19 @@ class SubmitOperationService
     set_write_off
     set_new_total_price
     set_new_cashback
-    update_operation
+    DB.transaction do
+      update_operation
+      update_user_bonus
+      @operation.update(done: true)
+    end
     respond
   end
 
   private
+
+  def update_user_bonus
+    @user.update(bonus: @user.bonus - @operation.write_off.to_f.round(2) + @new_cashback.to_f.round(2))
+  end
 
   def update_operation
     @operation.update(write_off: @write_off, check_summ: @new_total_price)
@@ -22,22 +31,22 @@ class SubmitOperationService
 
   def respond
     {
-      status: 'success',
-      message: 'Operation confirmed',
+      status: 200,
+      message: 'Данные успешно обработаны!',
       operation: {
-        user_id: @operation.user_id,
+        user_id: @user.id,
         cashback: @new_cashback.to_f.round(2),
-        total_cashback_percent: @operation.cashback_percent.to_f.round(2),
-        total_discount: @operation.discount.to_f.round(2),
-        total_discount_percent: @operation.discount_percent.to_f.round(2),
+        cashback_percent: "#{@operation.cashback_percent.to_f.round(2)}%",
+        discount: @operation.discount.to_f.round(2),
+        discount_percent: "#{@operation.discount_percent.to_f.round(2)}%",
         write_off: @operation.write_off.to_f.round(2),
-        final_price: @operation.check_summ.to_f.round(2)
+        check_summ: @operation.check_summ.to_f.round(2)
       }
     }
   end
 
   def set_write_off
-    @write_off = [@operation.check_summ, @write_off].min
+    @write_off = [@operation.allowed_write_off, @write_off].min
 
     write_off_valid?
   end
@@ -49,8 +58,7 @@ class SubmitOperationService
   end
 
   def set_new_cashback
-    @new_cashback = @operation.cashback
-
+    @new_cashback = @new_total_price * @operation.cashback_percent / 100.0
     raise StandardError, 'Cashback should not be negative' if @new_cashback.negative?
   end
 

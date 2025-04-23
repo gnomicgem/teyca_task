@@ -52,7 +52,7 @@ post '/submit' do
 
   operation = Operation[operation_id] or halt 404, { status: 'error', message: 'Operation not found' }.to_json
 
-  SubmitOperationService.new(operation, write_off).call.to_json
+  SubmitOperationService.new(@user, operation, write_off).call.to_json
 rescue StandardError => e
   status 422
   { status: 'error', message: e.message }.to_json

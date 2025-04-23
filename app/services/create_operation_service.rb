@@ -15,15 +15,13 @@ class CreateOperationService
   end
 
   def call
-    DB.transaction do
-      parse_positions
-      limit_total_discount
-      set_total_discount_percent
-      set_total_cashback_percent
-      set_final_price
-      set_available_write_off
-      create_operation
-    end
+    parse_positions
+    limit_total_discount
+    set_total_discount_percent
+    set_total_cashback_percent
+    set_final_price
+    set_available_write_off
+    create_operation
     respond
   end
 
@@ -31,21 +29,26 @@ class CreateOperationService
 
   def respond
     {
-      status: 'success',
-      user: { id: @user.id, name: @user.name },
+      status: 200,
+      user: {
+        id: @user.id,
+        template_id: @user.template.id,
+        name: @user.name,
+        bonus: @user.bonus.to_f.round(2)
+      },
       operation_id: @operation.id,
-      total_price: @final_price,
-      bonuses: {
-        balance: @user.bonus.to_f.round(2),
-        available_write_off: @available_write_off,
-        total_cashback_percent: @total_cashback_percent,
-        will_be_awarded: @total_cashback
+      summ: @final_price,
+      positions: @operation_positions,
+      discount: {
+        summ: @total_discount,
+        value: "#{@total_discount_percent}%"
       },
-      discounts: {
-        total_discount: @total_discount,
-        total_discount_percent: @total_discount_percent
-      },
-      positions: @operation_positions
+      cashback: {
+        existed_summ: @user.bonus.to_f.round(2),
+        allowed_summ: @available_write_off,
+        value: "#{@total_cashback_percent}%",
+        will_add: @total_cashback
+      }
     }
   end
 

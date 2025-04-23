@@ -1,4 +1,4 @@
-# API Расчет и подтверждение операции
+# Расчет и подтверждение операции API
 
 Серверное приложение на базе Sinatra с использованием базы данных SQLite и библиотеки Sequel. 
 Предоставляет собой API для работы с операциями оплаты товаров, 
@@ -9,14 +9,14 @@
 Клонируйте репозиторий:
 
 ```bash
-git clone <url>
-cd <название_папки>
+   git clone https://github.com/gnomicgem/teyca_task.git
+   cd teyca_task
 ```
 
 Установите зависимости:
 
 ```bash
-bundle install
+  bundle install
 ```
 
 Запустите сервер:
@@ -68,27 +68,19 @@ Body:
 
 #### Response example
 
-Success:
+Success (200):
 
 ```
 {
-    "status": "success",
+    "status": 200,
     "user": {
         "id": 1,
-        "name": "Иван"
+        "template_id": 1,
+        "name": "Иван",
+        "bonus": 10000.0
     },
-    "operation_id": 1,
-    "total_price": 734.0,
-    "bonuses": {
-        "balance": 10000.0,
-        "available_write_off": 434.0,
-        "total_cashback_percent": 4.32,
-        "will_be_awarded": 32.0
-    },
-    "discounts": {
-        "total_discount": 6.0,
-        "total_discount_percent": 0.81
-    },
+    "operation_id": 2,
+    "summ": 734.0,
     "positions": [
         {
             "id": 1,
@@ -122,7 +114,17 @@ Success:
             "discount_percent": 0,
             "discount": 0.0
         }
-    ]
+    ],
+    "discount": {
+        "summ": 6.0,
+        "value": 0.81%
+    },
+    "cashback": {
+        "existed_summ": 10000.0,
+        "allowed_summ": 434.0,
+        "value": 4.28%,
+        "will_add": 31.7
+    }
 }
 ```
 
@@ -154,8 +156,8 @@ Body:
     "template_id": 1,
     "name": "Иван",
     "bonus": 10000,
-    "operation_id": 1,
-    "write_off": 100
+    "operation_id": 2,
+    "write_off": 434
 }
 ```
 
@@ -165,16 +167,16 @@ Success:
 
 ```
 {
-    "status": "success",
-    "message": "Operation confirmed",
+    "status": 200,
+    "message": "Данные успешно обработаны!",
     "operation": {
         "user_id": 1,
-        "cashback": 32.0,
-        "total_cashback_percent": 4.32,
-        "total_discount": 6.0,
-        "total_discount_percent": 0.81,
+        "cashback": 18.58,
+        "cashback_percent": "4.28%",
+        "discount": 6.0,
+        "discount_percent": "0.81%",
         "write_off": 150.0,
-        "final_price": 584.0
+        "check_summ": 434.0
     }
 }
 ```

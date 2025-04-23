@@ -39,7 +39,7 @@ class CheckPositionService
   end
 
   def set_cashback
-    @cashback = @product_total * @cashback_percent / 100.0
+    @cashback = (@product_total - @discount) * @cashback_percent / 100.0
   end
 
   def check_product_type
